@@ -1,0 +1,28 @@
+1. Open CMD
+2. Type and run:
+  mysql -u root -p
+3. Enter the password for the root user when prompted.
+
+4. Now paste and execute one statement at a time:
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+CREATE DATABASE IF NOT EXISTS hotel;
+
+USE hotel;
+
+CREATE TABLE IF NOT EXISTS rooms (
+    room_no INT PRIMARY KEY,
+    type VARCHAR(50),
+    location VARCHAR(50),
+    max_guests INT,
+    rent_per_day INT,
+    status VARCHAR(20)
+);
+
+INSERT INTO rooms (room_no, type, location, max_guests, rent_per_day, status) VALUES
+(101, 'Deluxe', '1st Floor', 2, 1500, 'Vacant'),
+(102, 'Super Deluxe', '2nd Floor', 3, 2500, 'Vacant'),
+(103, 'Simple', 'Ground Floor', 2, 1000, 'Vacant'),
+(104, 'Deluxe', '3rd Floor', 2, 2000, 'Occupied'),
+(105, 'Simple', '1st Floor', 1, 800, 'Vacant');
