@@ -26,3 +26,21 @@ INSERT INTO rooms (room_no, type, location, max_guests, rent_per_day, status) VA
 (103, 'Simple', 'Ground Floor', 2, 1000, 'Vacant'),
 (104, 'Deluxe', '3rd Floor', 2, 2000, 'Occupied'),
 (105, 'Simple', '1st Floor', 1, 800, 'Vacant');
+
+
+CREATE TABLE IF NOT EXISTS booking (
+    booking_id INT AUTO_INCREMENT PRIMARY KEY,
+    cname VARCHAR(100),
+    idno VARCHAR(50),
+    idtype VARCHAR(50),
+    address VARCHAR(255),
+    phone VARCHAR(15),
+    gender VARCHAR(10),
+    dateofcheckin DATE,
+    room_no INT,
+    FOREIGN KEY (room_no) REFERENCES rooms(room_no)
+);
+
+INSERT INTO booking (cname, idno, idtype, address, phone, gender, dateofcheckin, room_no) VALUES
+('John Doe', 'AB1234567', 'Passport', '123 Elm Street', '9876543210', 'Male', '2024-12-01', 104),
+('Jane Smith', 'DL567890', 'Driver License', '456 Oak Avenue', '8765432109', 'Female', '2024-12-02', 104);
