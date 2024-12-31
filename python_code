@@ -1,0 +1,115 @@
+import mysql.connector
+
+# Connect to the database
+def connect_to_database():
+    try:
+        con = mysql.connector.connect(
+            host="localhost",
+            user="root",           # Your MySQL username
+            password="root",       # Your MySQL password
+            database="hotel"       # Database name
+        )
+        if con.is_connected():
+            print("Connected to the hotel database.")
+            return con
+        else:
+            print("Failed to connect to the database.")
+            return None
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+        return None
+
+# Function to create a new room
+def create_room(con):
+    room_no = int(input("Enter Room No. : "))
+    room_type = input("Enter Room Type (Simple/Deluxe/Super Deluxe): ")
+    max_guests = int(input("Enter maximum number of guests : "))
+    location = input("Enter Location details : ")
+    rent_per_day = int(input("Enter Per Day Charges : "))
+    
+    cursor = con.cursor()
+    query = """
+        INSERT INTO rooms (room_no, type, location, max_guests, rent_per_day, status)
+        VALUES (%s, %s, %s, %s, %s, 'Vacant');
+    """
+    data = (room_no, room_type, location, max_guests, rent_per_day)
+    cursor.execute(query, data)
+    con.commit()
+    print("Room details added successfully.")
+
+# Function to display available rooms
+def display_rooms(con):
+    cursor = con.cursor()
+    query = "SELECT room_no, type, location, rent_per_day, status FROM rooms WHERE status = 'Vacant';"
+    cursor.execute(query)
+    rooms = cursor.fetchall()
+    
+    print("\n--- Available Rooms ---")
+    for room in rooms:
+        print(f"Room No: {room[0]}, Type: {room[1]}, Location: {room[2]}, Rent Per Day: {room[3]}")
+    
+    return rooms
+
+# Function to book a room
+def book_room(con):
+    display_rooms(con)
+    
+    room_no = int(input("\nEnter Room No. you want to book: "))
+    cursor = con.cursor()
+    query = "SELECT * FROM rooms WHERE room_no = %s AND status = 'Vacant';"
+    cursor.execute(query, (room_no,))
+    room = cursor.fetchone()
+    
+    if room:
+        cname = input("Enter Customer Name: ")
+        idno = input("Enter ID Number: ")
+        idtype = input("Enter ID Type (e.g., Passport/Driver License): ")
+        address = input("Enter Address: ")
+        phone = input("Enter Phone Number: ")
+        gender = input("Enter Gender: ")
+        dateofcheckin = input("Enter Check-In Date (YYYY-MM-DD): ")
+
+        booking_query = """
+            INSERT INTO booking (cname, idno, idtype, address, phone, gender, dateofcheckin, room_no)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s);
+        """
+        booking_data = (cname, idno, idtype, address, phone, gender, dateofcheckin, room_no)
+        cursor.execute(booking_query, booking_data)
+        
+        # Update room status to 'Occupied'
+        update_query = "UPDATE rooms SET status = 'Occupied' WHERE room_no = %s;"
+        cursor.execute(update_query, (room_no,))
+        con.commit()
+        print("Room booked successfully.")
+    else:
+        print("Selected room is either invalid or not available.")
+
+# Main function to run the menu
+def show_menu(con):
+    while True:
+        print("\n--- Hotel Management System ---")
+        print("1. Add Room")
+        print("2. Book Room")
+        print("3. Show Available Rooms")
+        print("4. Exit")
+        
+        choice = input("Enter your choice: ")
+        
+        if choice == '1':
+            create_room(con)
+        elif choice == '2':
+            book_room(con)
+        elif choice == '3':
+            display_rooms(con)
+        elif choice == '4':
+            print("Exiting the system.")
+            break
+        else:
+            print("Invalid choice! Please try again.")
+
+# Connect to the database and run the menu
+if __name__ == "__main__":
+    con = connect_to_database()
+    if con:
+        show_menu(con)
+        con.close()
